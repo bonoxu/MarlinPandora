@@ -36,7 +36,8 @@ PandoraPFANewProcessor::PandoraPFANewProcessor() :
     m_pGeometryCreator(NULL),
     m_pTrackCreator(NULL),
     m_pMCParticleCreator(NULL),
-    m_pPfoCreator(NULL)
+    m_pPfoCreator(NULL),
+    m_pMyObjectCreator(NULL)
 {
     _description = "Pandora reconstructs clusters and particle flow objects";
     this->ProcessSteeringFile();
@@ -57,6 +58,7 @@ void PandoraPFANewProcessor::init()
         m_pTrackCreator = new TrackCreator(m_trackCreatorSettings, m_pPandora);
         m_pMCParticleCreator = new MCParticleCreator(m_mcParticleCreatorSettings, m_pPandora);
         m_pPfoCreator = new PfoCreator(m_pfoCreatorSettings, m_pPandora);
+        m_pMyObjectCreator = new MyObjectCreator(m_myObjectCreatorSettings, m_pPandora);
 
         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, this->RegisterUserComponents());
         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, m_pGeometryCreator->CreateGeometry());
@@ -103,7 +105,8 @@ void PandoraPFANewProcessor::processEvent(LCEvent *pLCEvent)
 
         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::ProcessEvent(*m_pPandora));
         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, m_pPfoCreator->CreateParticleFlowObjects(pLCEvent));
-
+        PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, m_pMyObjectCreator->CreateMyObjects(pLCEvent));
+        
         PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::Reset(*m_pPandora));
         this->Reset();
     }
@@ -146,6 +149,7 @@ void PandoraPFANewProcessor::end()
     delete m_pTrackCreator;
     delete m_pMCParticleCreator;
     delete m_pPfoCreator;
+    delete m_pMyObjectCreator;
 
     streamlog_out(MESSAGE) << "PandoraPFANewProcessor - End" << std::endl;
 }
@@ -338,6 +342,13 @@ void PandoraPFANewProcessor::ProcessSteeringFile()
                             "The algorithm name for filling start vertex",
                             m_pfoCreatorSettings.m_startVertexAlgName,
                             std::string("PandoraPFANew"));
+
+    // added new
+    registerOutputCollection(LCIO::LCRELATION, 
+                            "MyObjectCollectionName",
+                            "Cluster fitting to ReconstructedParticle Relations Collection Name",
+                            m_myObjectCreatorSettings.m_objectCollectionName,
+                            std::string("MyObjectCollection"));
 
     // Energy resolution parameters
     registerProcessorParameter("EMStochasticTerm",

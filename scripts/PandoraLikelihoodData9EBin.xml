@@ -1,4 +1,4 @@
-<NEnergyBins>9</NEnergyBins>
+<NEnergyBins>9 </NEnergyBins>
 <EnergyBinLowerEdges>0 0.2 0.5 1 1.5 2.5 5 10 20 </EnergyBinLowerEdges>
 <NSignalEvents>42213 22561 20497 14219 19767 26770 22039 14547 10186 </NSignalEvents>
 <NBackgroundEvents>109034 45109 13323 4171 3447 3033 2077 1206 1006 </NBackgroundEvents>

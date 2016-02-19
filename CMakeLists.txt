@@ -59,9 +59,10 @@ endif()
 ### DEPENDENCIES ############################################################
 
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
-FIND_PACKAGE( MarlinUtil 01.10 REQUIRED )
+FIND_PACKAGE( MarlinUtil REQUIRED )
 FIND_PACKAGE( PandoraSDK 02.02.00 REQUIRED )
 FIND_PACKAGE( LCContent 02.02.00 REQUIRED )
+
 FOREACH( pkg Marlin MarlinUtil PandoraSDK LCContent )
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )

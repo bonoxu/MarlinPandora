@@ -16,6 +16,7 @@
 #include "MCParticleCreator.h"
 #include "PfoCreator.h"
 #include "TrackCreator.h"
+#include "MyObjectCreator.h"
 
 namespace pandora {class Pandora;}
 
@@ -136,6 +137,7 @@ private:
     TrackCreator                       *m_pTrackCreator;                    ///< The track creator
     MCParticleCreator                  *m_pMCParticleCreator;               ///< The mc particle creator
     PfoCreator                         *m_pPfoCreator;                      ///< The pfo creator
+    MyObjectCreator                    *m_pMyObjectCreator;                 ///< My object creator
 
     Settings                            m_settings;                         ///< The settings for the pandora pfa new processor
     CaloHitCreator::Settings            m_caloHitCreatorSettings;           ///< The calo hit creator settings
@@ -143,7 +145,8 @@ private:
     MCParticleCreator::Settings         m_mcParticleCreatorSettings;        ///< The mc particle creator settings
     TrackCreator::Settings              m_trackCreatorSettings;             ///< The track creator settings
     PfoCreator::Settings                m_pfoCreatorSettings;               ///< The pfo creator settings
-
+    MyObjectCreator::Settings           m_myObjectCreatorSettings;          ///< The  My object settin
+    
     typedef std::map<const pandora::Pandora *, EVENT::LCEvent *> PandoraToLCEventMap;
     static PandoraToLCEventMap          m_pandoraToLCEventMap;              ///< The pandora to lc event map
 };

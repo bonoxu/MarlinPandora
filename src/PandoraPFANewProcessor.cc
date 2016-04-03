@@ -598,6 +598,11 @@ void PandoraPFANewProcessor::ProcessSteeringFile()
                             m_trackCreatorSettings.m_maxTpcInnerRDistance,
                             float(50.));
 
+    registerProcessorParameter("UseTrackQualityCut",
+                            "Use Track Quality Cut",
+                            m_trackCreatorSettings.m_useTrackQualityCut,
+                            int(1));
+
     // Additional geometry parameters
     registerProcessorParameter("ECalEndCapInnerSymmetryOrder",
                             "ECal end cap inner symmetry order (missing from ILD gear files)",

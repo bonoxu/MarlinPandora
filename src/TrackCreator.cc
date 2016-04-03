@@ -726,58 +726,65 @@ void TrackCreator::DefineTrackPfoUsage(const EVENT::Track *const pTrack, Pandora
             if (absoluteZ < zMin)
                 zMin = absoluteZ;
         }
-
-        if (this->PassesQualityCuts(pTrack, trackParameters))
+        if (0 == m_settings.m_useTrackQualityCut)
         {
-            const pandora::CartesianVector &momentumAtDca(trackParameters.m_momentumAtDca.Get());
-            const float pX(momentumAtDca.GetX()), pY(momentumAtDca.GetY()), pZ(momentumAtDca.GetZ());
-            const float pT(std::sqrt(pX * pX + pY * pY));
-
-            const float zCutForNonVertexTracks(m_tpcInnerR * std::fabs(pZ / pT) + m_settings.m_zCutForNonVertexTracks);
-            const bool passRzQualityCuts((zMin < zCutForNonVertexTracks) && (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance));
-
-            const bool isV0(this->IsV0(pTrack));
-            const bool isDaughter(this->IsDaughter(pTrack));
-
-            // Decide whether track can be associated with a pandora cluster and used to form a charged PFO
-            if ((d0 < m_settings.m_d0TrackCut) && (z0 < m_settings.m_z0TrackCut) && (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance))
+            canFormPfo = true;
+            canFormClusterlessPfo = true;
+        }
+        else
+        {
+            if (this->PassesQualityCuts(pTrack, trackParameters))
             {
-                canFormPfo = true;
-            }
-            else if (passRzQualityCuts && (0 != m_settings.m_usingNonVertexTracks))
-            {
-                canFormPfo = true;
-            }
-            else if (isV0 || isDaughter)
-            {
-                canFormPfo = true;
-            }
+                const pandora::CartesianVector &momentumAtDca(trackParameters.m_momentumAtDca.Get());
+                const float pX(momentumAtDca.GetX()), pY(momentumAtDca.GetY()), pZ(momentumAtDca.GetZ());
+                const float pT(std::sqrt(pX * pX + pY * pY));
 
-            // Decide whether track can be used to form a charged PFO, even if track fails to be associated with a pandora cluster
-            const float particleMass(trackParameters.m_mass.Get());
-            const float trackEnergy(std::sqrt(momentumAtDca.GetMagnitudeSquared() + particleMass * particleMass));
+                const float zCutForNonVertexTracks(m_tpcInnerR * std::fabs(pZ / pT) + m_settings.m_zCutForNonVertexTracks);
+                const bool passRzQualityCuts((zMin < zCutForNonVertexTracks) && (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance));
 
-            if ((0 != m_settings.m_usingUnmatchedVertexTracks) && (trackEnergy < m_settings.m_unmatchedVertexTrackMaxEnergy))
-            {
-                if ((d0 < m_settings.m_d0UnmatchedVertexTrackCut) && (z0 < m_settings.m_z0UnmatchedVertexTrackCut) &&
-                    (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance))
+                const bool isV0(this->IsV0(pTrack));
+                const bool isDaughter(this->IsDaughter(pTrack));
+
+                // Decide whether track can be associated with a pandora cluster and used to form a charged PFO
+                if ((d0 < m_settings.m_d0TrackCut) && (z0 < m_settings.m_z0TrackCut) && (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance))
                 {
-                    canFormClusterlessPfo = true;
+                    canFormPfo = true;
                 }
-                else if (passRzQualityCuts && (0 != m_settings.m_usingNonVertexTracks) && (0 != m_settings.m_usingUnmatchedNonVertexTracks))
+                else if (passRzQualityCuts && (0 != m_settings.m_usingNonVertexTracks))
                 {
-                    canFormClusterlessPfo = true;
+                    canFormPfo = true;
                 }
                 else if (isV0 || isDaughter)
                 {
-                    canFormClusterlessPfo = true;
+                    canFormPfo = true;
+                }
+
+                // Decide whether track can be used to form a charged PFO, even if track fails to be associated with a pandora cluster
+                const float particleMass(trackParameters.m_mass.Get());
+                const float trackEnergy(std::sqrt(momentumAtDca.GetMagnitudeSquared() + particleMass * particleMass));
+
+                if ((0 != m_settings.m_usingUnmatchedVertexTracks) && (trackEnergy < m_settings.m_unmatchedVertexTrackMaxEnergy))
+                {
+                    if ((d0 < m_settings.m_d0UnmatchedVertexTrackCut) && (z0 < m_settings.m_z0UnmatchedVertexTrackCut) &&
+                        (rInner < m_tpcInnerR + m_settings.m_maxTpcInnerRDistance))
+                    {
+                        canFormClusterlessPfo = true;
+                    }
+                    else if (passRzQualityCuts && (0 != m_settings.m_usingNonVertexTracks) && (0 != m_settings.m_usingUnmatchedNonVertexTracks))
+                    {
+                        canFormClusterlessPfo = true;
+                    }
+                    else if (isV0 || isDaughter)
+                    {
+                        canFormClusterlessPfo = true;
+                    }
                 }
             }
-        }
-        else if (this->IsDaughter(pTrack) || this->IsV0(pTrack))
-        {
-            streamlog_out(WARNING) << "Recovering daughter or v0 track " << trackParameters.m_momentumAtDca.Get().GetMagnitude() << std::endl;
-            canFormPfo = true;
+            else if (this->IsDaughter(pTrack) || this->IsV0(pTrack))
+            {
+                streamlog_out(WARNING) << "Recovering daughter or v0 track " << trackParameters.m_momentumAtDca.Get().GetMagnitude() << std::endl;
+                canFormPfo = true;
+            }
         }
     }
 
